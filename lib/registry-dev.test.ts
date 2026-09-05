@@ -127,6 +127,17 @@ describe('createDevRegistry', () => {
         expect(directoryImportMock).toHaveBeenCalledTimes(1);
     });
 
+    it('excludes test modules from route imports', async () => {
+        const { app } = buildApp();
+        await app.request('/flat/single');
+        const { importPattern } = directoryImportMock.mock.calls[0][0];
+
+        expect(importPattern.test('single.ts')).toBe(true);
+        expect(importPattern.test('single.tsx')).toBe(true);
+        expect(importPattern.test('single.test.ts')).toBe(false);
+        expect(importPattern.test('single.spec.tsx')).toBe(false);
+    });
+
     it('imports each top directory at most once', async () => {
         const { app } = buildApp();
         await app.request('/flat/single');
