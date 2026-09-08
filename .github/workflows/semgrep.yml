@@ -23,11 +23,21 @@ jobs:
             security-events: write
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-            - run: semgrep ci --sarif > semgrep.sarif
+            - name: Run Semgrep
+              id: scan
+              run: semgrep ci --sarif-output=semgrep.sarif
               env:
                   SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+            - name: Validate SARIF report
+              id: sarif
+              if: ${{ !cancelled() && steps.scan.outcome != 'skipped' }}
+              run: |
+                  if ! test -s semgrep.sarif || ! python -m json.tool semgrep.sarif > /dev/null; then
+                      echo "::error::Semgrep did not produce a complete JSON report. Check the Run Semgrep logs for authentication, configuration, or scan errors."
+                      exit 1
+                  fi
             - name: Upload SARIF file for GitHub Advanced Security Dashboard
               uses: github/codeql-action/upload-sarif@v4
               with:
                   sarif_file: semgrep.sarif
-              if: always()
+              if: ${{ !cancelled() && steps.sarif.outcome == 'success' }}
