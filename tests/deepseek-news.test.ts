@@ -1,7 +1,7 @@
 import { load } from 'cheerio';
 import { describe, expect, it } from 'vitest';
 
-import { extractNewsLinks, findLatestNewsUrl } from './news';
+import { extractNewsLinks, findLatestNewsUrl } from '../lib/routes/deepseek/news';
 
 describe('DeepSeek news route', () => {
     it('discovers the latest news page from the documentation landing page', () => {
