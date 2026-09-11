@@ -104,6 +104,7 @@ export type RoutePath =
   | `/95mm/category/:category`
   | `/95mm/tab/:tab?`
   | `/95mm/tag/:tag`
+  | `/98zhibo/zuqiujijin`
   | `/99percentinvisible/transcript`
   | `/9to5/:subsite/:tag?`
   | `/a9vg/:category{.+}?`
@@ -1803,6 +1804,7 @@ export type RoutePath =
   | `/iqiyi/album/:id`
   | `/iqiyi/user/video/:uid`
   | `/iqnew/latest`
+  | `/iracing/news`
   | `/iresearch/report/:type?/:id?`
   | `/iresearch/weekly/:id?`
   | `/isct/news/:lang`
@@ -2143,6 +2145,7 @@ export type RoutePath =
   | `/makerworld/trending`
   | `/makerworld/user/:handle/upload`
   | `/malaysiakini/:lang/:category?`
+  | `/maldita/updates/:category?`
   | `/mamibuy/:caty?`
   | `/mangadex/manga/:id/:lang?`
   | `/mangadex/mdlist/:id/:lang?`
