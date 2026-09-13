@@ -15111,7 +15111,7 @@ export default {
         ],
         "example": "/skills-sh/trending",
         "parameters": {
-          "view": "`trending`（近期增长，默认）或 `hot`（当前小时相较昨天同一小时的变化）"
+          "view": "`all-time`（总安装量）、`trending`（24 小时趋势，默认）或 `hot`（当前小时相较昨天同一小时的变化）"
         },
         "features": {
           "requireConfig": false,
