@@ -6,7 +6,7 @@ skills.sh exposes authenticated JSON leaderboard views but no first-party RSS fe
 
 ## Scope
 
-- Add RSS feeds for the skills.sh `trending` and `hot` leaderboard views.
+- Add RSS feeds for the skills.sh `all-time`, `trending`, and `hot` leaderboard views.
 - Forward the request-scoped Vercel OIDC token to the official skills.sh API.
 - Show the stable leaderboard metadata and the author-provided description from each `SKILL.md`.
 - Deploy and validate both feeds on the linked Vercel project.
@@ -19,7 +19,8 @@ skills.sh exposes authenticated JSON leaderboard views but no first-party RSS fe
 
 ## Acceptance criteria
 
-- `/skills-sh` and `/skills-sh/trending` return the current trending leaderboard.
+- `/skills-sh` and `/skills-sh/trending` return the 24-hour trending leaderboard.
+- `/skills-sh/all-time` returns the leaderboard ranked by total installs.
 - `/skills-sh/hot` returns the hot leaderboard and includes change metadata when supplied upstream.
 - Each item displays its author-provided description when a `SKILL.md` snapshot is available.
 - Unsupported views fail with an actionable error.

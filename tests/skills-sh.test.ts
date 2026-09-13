@@ -24,8 +24,9 @@ beforeEach(() => {
 describe('skills.sh leaderboard route', () => {
     it('defaults to trending and rejects unsupported views', () => {
         expect(parseView()).toBe('trending');
+        expect(parseView('all-time')).toBe('all-time');
         expect(parseView('hot')).toBe('hot');
-        expect(() => parseView('all-time')).toThrow('Supported values are');
+        expect(() => parseView('weekly')).toThrow('Supported values are');
     });
 
     it('maps stable leaderboard metadata without inventing a publication date', () => {
@@ -72,6 +73,25 @@ describe('skills.sh leaderboard route', () => {
             lastBuildDate: '2026-09-13T00:00:00.000Z',
             item: [{ guid: skill.id, description: expect.stringContaining('Discover useful skills.') }],
         });
+    });
+
+    it('requests and labels the all-time leaderboard', async () => {
+        vi.mocked(ofetch)
+            .mockResolvedValueOnce({ data: [skill] })
+            .mockResolvedValueOnce({ files: null });
+
+        const result = await handler({
+            req: {
+                param: vi.fn().mockReturnValue('all-time'),
+                header: vi.fn().mockReturnValue('oidc-token'),
+            },
+        } as never);
+
+        expect(ofetch).toHaveBeenNthCalledWith(1, 'https://skills.sh/api/v1/skills', {
+            headers: { Authorization: 'Bearer oidc-token' },
+            query: { view: 'all-time', page: 0, per_page: 100 },
+        });
+        expect(result).toMatchObject({ title: 'skills.sh All Time Skills', link: 'https://skills.sh' });
     });
 
     it('fails clearly when no Vercel OIDC token is available', async () => {
