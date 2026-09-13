@@ -46,13 +46,13 @@ Feasible on Vercel. skills.sh accepts a Vercel-issued OIDC bearer token, and Ver
 - `vitest run tests/skills-sh.test.ts`: 5 tests passed, including plain, quoted, and folded frontmatter descriptions.
 - `eslint lib/routes/skills-sh/index.ts lib/routes/skills-sh/namespace.ts tests/skills-sh.test.ts`: passed.
 - `npm run vercel-build`: passed, and the generated route registry included `skills-sh`.
-- Description-enriched production feed validation is pending deployment.
-- Deployed commit `4823470` to the existing `rss-hub` Vercel production project on 2026-09-13.
-- `https://rss.ljhboard.cn/skills-sh/trending`: HTTP 200, 100 items, with install and source-type metadata.
-- `https://rss.ljhboard.cn/skills-sh/hot`: HTTP 200, 100 items, with install, hourly-change, and same-hour-yesterday metadata.
+- Deployed the description-enriched feed to the existing `rss-hub` Vercel production project on 2026-09-13; the production deployment reached `READY` and was aliased to `rss.ljhboard.cn`.
+- `https://rss.ljhboard.cn/skills-sh/trending`: HTTP 200 in 15.90 seconds on the validation request, 100 items, and all 100 included an author-provided description.
+- `https://rss.ljhboard.cn/skills-sh/hot`: HTTP 200 in 13.88 seconds on the validation request, 100 items, and 96 included an author-provided description; the four missing descriptions were tolerated as designed.
 - Final review found no blocking findings and no accepted follow-ups requiring a roadmap.
 
 ## Risks
 
 - Non-Vercel deployments will not have an OIDC token unless one is injected at runtime.
 - skills.sh may change its authenticated API response shape.
+- A cold feed request requires up to 100 detail API calls; bounded concurrency and detail caching limit upstream load, but the first response can take around 14–16 seconds.
