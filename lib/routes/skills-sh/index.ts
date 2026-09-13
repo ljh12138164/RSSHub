@@ -10,9 +10,9 @@ import ofetch from '@/utils/ofetch';
 
 const apiUrl = 'https://skills.sh/api/v1/skills';
 const siteUrl = 'https://skills.sh';
-const supportedViews = new Set(['trending', 'hot']);
+const supportedViews = new Set(['all-time', 'trending', 'hot']);
 
-type LeaderboardView = 'trending' | 'hot';
+type LeaderboardView = 'all-time' | 'trending' | 'hot';
 
 type Skill = {
     id: string;
@@ -40,7 +40,7 @@ export const route: Route = {
     categories: ['programming'],
     example: '/skills-sh/trending',
     parameters: {
-        view: '`trending`（近期增长，默认）或 `hot`（当前小时相较昨天同一小时的变化）',
+        view: '`all-time`（总安装量）、`trending`（24 小时趋势，默认）或 `hot`（当前小时相较昨天同一小时的变化）',
     },
     features: {
         requireConfig: false,
@@ -80,9 +80,9 @@ export async function handler(ctx: Context): Promise<Data> {
     }
 
     return {
-        title: `skills.sh ${view === 'hot' ? 'Hot' : 'Trending'} Skills`,
-        link: view === 'hot' ? `${siteUrl}/hot` : `${siteUrl}/trending`,
-        description: view === 'hot' ? 'Skills gaining installs compared with the same hour yesterday.' : 'Skills with the most recent install growth.',
+        title: `skills.sh ${view === 'all-time' ? 'All Time' : view === 'hot' ? 'Hot' : 'Trending'} Skills`,
+        link: view === 'all-time' ? siteUrl : `${siteUrl}/${view}`,
+        description: view === 'all-time' ? 'Skills ranked by total installs.' : view === 'hot' ? 'Skills gaining installs compared with the same hour yesterday.' : 'Skills with the most install growth over the last 24 hours.',
         lastBuildDate: response.generatedAt,
         item: await pMap(
             response.data,
@@ -102,7 +102,7 @@ export async function handler(ctx: Context): Promise<Data> {
 
 export function parseView(value = 'trending'): LeaderboardView {
     if (!supportedViews.has(value)) {
-        throw new InvalidParameterError('Invalid view. Supported values are "trending" and "hot".');
+        throw new InvalidParameterError('Invalid view. Supported values are "all-time", "trending", and "hot".');
     }
     return value as LeaderboardView;
 }
