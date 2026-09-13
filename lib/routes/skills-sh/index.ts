@@ -1,9 +1,11 @@
 import { escape } from 'entities';
 import type { Context } from 'hono';
+import pMap from 'p-map';
 
 import ConfigNotFoundError from '@/errors/types/config-not-found';
 import InvalidParameterError from '@/errors/types/invalid-parameter';
 import type { Data, DataItem, Route } from '@/types';
+import cache from '@/utils/cache';
 import ofetch from '@/utils/ofetch';
 
 const apiUrl = 'https://skills.sh/api/v1/skills';
@@ -27,6 +29,10 @@ type Skill = {
 type SkillsResponse = {
     data: Skill[];
     generatedAt?: string;
+};
+
+type SkillDetail = {
+    files: Array<{ path: string; contents: string }> | null;
 };
 
 export const route: Route = {
@@ -78,7 +84,19 @@ export async function handler(ctx: Context): Promise<Data> {
         link: view === 'hot' ? `${siteUrl}/hot` : `${siteUrl}/trending`,
         description: view === 'hot' ? 'Skills gaining installs compared with the same hour yesterday.' : 'Skills with the most recent install growth.',
         lastBuildDate: response.generatedAt,
-        item: response.data.map((skill, index) => toDataItem(skill, index, view)),
+        item: await pMap(
+            response.data,
+            async (skill, index) => {
+                let description: string | null = null;
+                try {
+                    description = await getDescription(skill, token);
+                } catch {
+                    // Keep the leaderboard available when an individual skill has no detail snapshot.
+                }
+                return toDataItem(skill, index, view, description);
+            },
+            { concurrency: 5 }
+        ),
     };
 }
 
@@ -89,8 +107,9 @@ export function parseView(value = 'trending'): LeaderboardView {
     return value as LeaderboardView;
 }
 
-export function toDataItem(skill: Skill, index: number, view: LeaderboardView): DataItem {
+export function toDataItem(skill: Skill, index: number, view: LeaderboardView, description?: string | null): DataItem {
     const metadata = [
+        ...(description ? [`<p>${escape(description)}</p>`] : []),
         `<p><strong>Rank:</strong> ${index + 1}</p>`,
         `<p><strong>Installs:</strong> ${skill.installs.toLocaleString('en-US')}</p>`,
         `<p><strong>Source:</strong> ${escape(skill.source)}</p>`,
@@ -115,4 +134,50 @@ export function toDataItem(skill: Skill, index: number, view: LeaderboardView): 
         category: [skill.sourceType],
         description: metadata.join(''),
     };
+}
+
+function getDescription(skill: Skill, token: string): Promise<string | null> {
+    return cache.tryGet(`skills-sh:description:${skill.id}`, async () => {
+        const detail = await ofetch<SkillDetail>(`${apiUrl}/${skill.id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const skillFile = detail.files?.find((file) => file.path === 'SKILL.md');
+        return skillFile ? parseDescription(skillFile.contents) : null;
+    });
+}
+
+export function parseDescription(contents: string): string | null {
+    const frontmatter = contents.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1];
+    if (!frontmatter) {
+        return null;
+    }
+
+    const lines = frontmatter.split(/\r?\n/);
+    const descriptionIndex = lines.findIndex((line) => line.startsWith('description:'));
+    if (descriptionIndex === -1) {
+        return null;
+    }
+
+    const value = lines[descriptionIndex].slice('description:'.length).trim();
+    if (['>', '>-', '|', '|-'].includes(value)) {
+        const blockLines: string[] = [];
+        const followingLines = lines.slice(descriptionIndex + 1);
+        for (const line of followingLines) {
+            if (!line.startsWith(' ') && !line.startsWith('\t')) {
+                break;
+            }
+            if (line.trim()) {
+                blockLines.push(line.trim());
+            }
+        }
+        if (!blockLines.length) {
+            return null;
+        }
+        return value.startsWith('>') ? blockLines.join(' ') : blockLines.join('\n');
+    }
+
+    const quoted = (value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"));
+    return (quoted ? value.slice(1, -1) : value) || null;
 }

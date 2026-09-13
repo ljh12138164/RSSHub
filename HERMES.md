@@ -2,8 +2,8 @@
 
 ## Active objective
 
-Authenticated skills.sh trending and hot RSS feeds are implemented, verified, and live in the `rss-hub` Vercel production project.
+Author-provided descriptions are implemented and locally verified for the skills.sh trending and hot RSS feeds.
 
 ## Next action
 
-Push `feat/skills-sh-feed` and merge it into `master` so future Git deployments preserve the live routes.
+Deploy the description-enriched feeds, validate production latency and content, then push `feat/skills-sh-feed`.
