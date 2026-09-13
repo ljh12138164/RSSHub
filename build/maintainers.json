@@ -1183,6 +1183,9 @@
   "/skebetter/manga/:order": [
     "SnowAgar25"
   ],
+  "/skills-sh/:view?": [
+    "ljh12138164"
+  ],
   "/sotwe/user/:id": [
     "TonyRL"
   ],
@@ -1685,6 +1688,12 @@
   ],
   "/xkb/:channel": [
     "TimWu007"
+  ],
+  "/yinxubwg/notice": [
+    "magazian"
+  ],
+  "/yinxubwg/exhibitionIndex/:type": [
+    "magazian"
   ],
   "/yoasobi-music/info/:category?": [
     "Kiotlin"

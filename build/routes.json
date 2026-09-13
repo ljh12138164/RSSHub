@@ -15102,6 +15102,39 @@
     "url": "skebetter.com",
     "lang": "en"
   },
+  "skills-sh": {
+    "routes": {
+      "/:view?": {
+        "path": "/:view?",
+        "categories": [
+          "programming"
+        ],
+        "example": "/skills-sh/trending",
+        "parameters": {
+          "view": "`trending`（近期增长，默认）或 `hot`（当前小时相较昨天同一小时的变化）"
+        },
+        "features": {
+          "requireConfig": false,
+          "requirePuppeteer": false,
+          "antiCrawler": false,
+          "supportBT": false,
+          "supportPodcast": false,
+          "supportScihub": false
+        },
+        "name": "Leaderboard",
+        "maintainers": [
+          "ljh12138164"
+        ],
+        "description": "skills.sh Agent Skills 热门榜单。该路由需要部署在已启用 OIDC Federation 的 Vercel 项目中。",
+        "location": "index.ts",
+        "module": "() => import('@/routes/skills-sh/index.ts')"
+      }
+    },
+    "apiRoutes": {},
+    "name": "skills.sh",
+    "url": "skills.sh",
+    "lang": "en"
+  },
   "sotwe": {
     "routes": {
       "/user/:id": {
@@ -21456,6 +21489,61 @@
     "name": "新快报",
     "url": "xkb.com.cn",
     "lang": "zh-CN"
+  },
+  "yinxubwg": {
+    "routes": {
+      "/notice": {
+        "path": "/notice",
+        "categories": [
+          "travel"
+        ],
+        "example": "/yinxubwg/notice",
+        "name": "Notice",
+        "maintainers": [
+          "magazian"
+        ],
+        "radar": [
+          {
+            "source": [
+              "www.yinxubwg.cn/yxgw/notice"
+            ],
+            "target": "/notice"
+          }
+        ],
+        "location": "notice.ts",
+        "module": "() => import('@/routes/yinxubwg/notice.ts')"
+      },
+      "/exhibitionIndex/:type": {
+        "path": "/exhibitionIndex/:type",
+        "categories": [
+          "travel"
+        ],
+        "example": "/yinxubwg/exhibitionIndex/2",
+        "parameters": {
+          "type": "Exhibition type. Supported values: `1` (Permanent Exhibition), `2` (Temporary Exhibition), `3` (Past Exhibitions)."
+        },
+        "name": "Exhibition Information",
+        "maintainers": [
+          "magazian"
+        ],
+        "radar": [
+          {
+            "source": [
+              "www.yinxubwg.cn/yxgw/exhibitionIndex"
+            ],
+            "target": "/exhibitionIndex/:type"
+          }
+        ],
+        "location": "exhibition.tsx",
+        "module": "() => import('@/routes/yinxubwg/exhibition.tsx')"
+      }
+    },
+    "apiRoutes": {},
+    "name": "Yinxu Museum",
+    "url": "www.yinxubwg.cn",
+    "zh": {
+      "name": "殷墟博物馆"
+    }
   },
   "yoasobi-music": {
     "routes": {

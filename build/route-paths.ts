@@ -3036,6 +3036,7 @@ export type RoutePath =
   | `/sketch/beta`
   | `/sketch/updates`
   | `/sketis/isabelle-dev/blog/:blog`
+  | `/skills-sh/:view?`
   | `/skysports/news/:team`
   | `/slashdot/:section?`
   | `/slowmist/:type?`
@@ -3717,6 +3718,8 @@ export type RoutePath =
   | `/yinxiang/note`
   | `/yinxiang/personal/:id`
   | `/yinxiang/tag/:id`
+  | `/yinxubwg/exhibitionIndex/:type`
+  | `/yinxubwg/notice`
   | `/ymgal/article/:type?`
   | `/ymgal/game/release`
   | `/yna/:lang?/:channel?`
