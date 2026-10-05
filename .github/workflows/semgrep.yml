@@ -18,12 +18,12 @@ jobs:
         runs-on: ubuntu-latest
         container:
             image: returntocorp/semgrep
-        if: github.repository == 'DIYgod/RSSHub' && github.triggering_actor != 'dependabot[bot]'
+        if: (github.triggering_actor != 'dependabot[bot]')
         permissions:
             security-events: write
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-            - run: semgrep ci --sarif > semgrep.sarif
+            - run: semgrep scan --config auto --sarif-output=semgrep.sarif
               env:
                   SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
             - name: Upload SARIF file for GitHub Advanced Security Dashboard
