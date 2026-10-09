@@ -39,7 +39,7 @@ jobs:
                     - platform: linux/amd64
                       runner: ubuntu-latest
                     - platform: linux/arm64
-                      runner: ubuntu-24.04-arm
+                      runner: ubuntu-26.04-arm
         permissions:
             packages: write
             id-token: write
@@ -50,7 +50,9 @@ jobs:
               # PERCENT=100 is safe: https://fedoraproject.org/wiki/Changes/Scale_ZRAM_to_full_memory_size
               run: |
                   sudo apt-get update -yq
-                  sudo apt-get install -yq "linux-modules-extra-$(uname -r)" zram-tools
+                  sudo apt-get install -yq zram-tools
+                  # TODO: remove when runner is 26.0
+                  modinfo zram > /dev/null 2>&1 || sudo apt-get install -yq "linux-modules-extra-$(uname -r)"
                   echo -e 'ALGO=zstd\nPERCENT=100' | sudo tee -a /etc/default/zramswap
                   sudo systemctl restart zramswap
                   swapon
@@ -270,6 +272,39 @@ jobs:
               run: |
                   docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
                       $(printf '${{ vars.DOCKER_USERNAME }}/${{ needs.release.outputs.repo-name }}@sha256:%s ' *)
+
+    github-release:
+        runs-on: ubuntu-latest
+        needs: [release, merge]
+        timeout-minutes: 5
+        permissions:
+            contents: write
+        steps:
+            - name: Create a source release for the published images
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  IMAGE_REPOSITORY: ${{ needs.release.outputs.repo-name }}
+                  DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+              run: |
+                  set -euo pipefail
+                  release_tag="v$(date -u +%Y.%m.%d)-${GITHUB_SHA:0:7}"
+                  if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+                      exit 0
+                  fi
+                  image_repository="${GITHUB_REPOSITORY,,}"
+                  cat > "$RUNNER_TEMP/release-notes.md" <<EOF
+                  Source commit: $GITHUB_SHA
+
+                  Published multi-platform images:
+                  - ghcr.io/$image_repository:$GITHUB_SHA
+                  - ghcr.io/$image_repository:chromium-bundled-$GITHUB_SHA
+                  - $DOCKER_USERNAME/$IMAGE_REPOSITORY:$GITHUB_SHA
+                  - $DOCKER_USERNAME/$IMAGE_REPOSITORY:chromium-bundled-$GITHUB_SHA
+
+                  Use these commit-specific image tags to reproduce this release. Daily Docker tags may be updated by subsequent builds.
+                  EOF
+                  gh release create "$release_tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+                      --title "$release_tag" --notes-file "$RUNNER_TEMP/release-notes.md"
 
     description:
         runs-on: ubuntu-slim
