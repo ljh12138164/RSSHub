@@ -17614,8 +17614,21 @@
       }
     ]
   },
+  "cloudflare.com": {
+    "_name": "Cloudflare",
+    "blog": [
+      {
+        "title": "Blog",
+        "docs": "https://docs.rsshub.app/routes/programming",
+        "source": [
+          "/"
+        ],
+        "target": "/cloudflare/blog"
+      }
+    ]
+  },
   "cloudflarestatus.com": {
-    "_name": "Cloudflare Status",
+    "_name": "Cloudflare",
     "www": [
       {
         "title": "Status",
@@ -17623,7 +17636,7 @@
         "source": [
           "/"
         ],
-        "target": "/cloudflarestatus/"
+        "target": "/cloudflare/status"
       }
     ]
   },

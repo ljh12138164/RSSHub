@@ -835,6 +835,34 @@ export default {
     ],
     "lang": "zh-CN"
   },
+  "cloudflarestatus": {
+    "routes": {
+      "/": {
+        "path": "/",
+        "name": "Status (legacy)",
+        "url": "www.cloudflarestatus.com",
+        "maintainers": [
+          "nczitzk",
+          "ljh12138164"
+        ],
+        "example": "/cloudflarestatus",
+        "description": "This route redirects to `/cloudflare/status`.",
+        "zh": {
+          "description": "此旧路由会重定向到 `/cloudflare/status`。"
+        },
+        "location": "index.tsx",
+        "module": () => import('@/routes/cloudflarestatus/index.tsx')
+      }
+    },
+    "apiRoutes": {},
+    "name": "Cloudflare Status",
+    "url": "cloudflarestatus.com",
+    "categories": [
+      "programming"
+    ],
+    "description": "",
+    "lang": "en"
+  },
   "picnob.info": {
     "routes": {
       "/user/:id/:type?": {
@@ -49925,16 +49953,57 @@ export default {
     },
     "apiRoutes": {}
   },
-  "cloudflarestatus": {
+  "cloudflare": {
     "routes": {
-      "/": {
-        "path": "/",
+      "/blog": {
+        "path": "/blog",
+        "name": "Blog",
+        "url": "blog.cloudflare.com",
+        "example": "/cloudflare/blog",
+        "categories": [
+          "programming"
+        ],
+        "maintainers": [
+          "ljh12138164"
+        ],
+        "description": "Uses the [official RSS feed](https://blog.cloudflare.com/rss/) for article metadata and fetches full articles from [Cloudflare Blog](https://blog.cloudflare.com/), including inline images, code blocks, and copyable prompts.",
+        "zh": {
+          "description": "来源：[Cloudflare Blog](https://blog.cloudflare.com/)。使用[官方 RSS](https://blog.cloudflare.com/rss/)获取文章列表、作者、日期和标签，再抓取并缓存网页正文，补齐图片、代码块和可复制的提示词。"
+        },
+        "features": {
+          "requireConfig": false,
+          "requirePuppeteer": false,
+          "antiCrawler": false,
+          "supportRadar": true,
+          "supportBT": false,
+          "supportPodcast": false,
+          "supportScihub": false
+        },
+        "radar": [
+          {
+            "source": [
+              "blog.cloudflare.com"
+            ],
+            "target": "/blog"
+          }
+        ],
+        "view": 0,
+        "location": "blog.ts",
+        "module": () => import('@/routes/cloudflare/blog.ts')
+      },
+      "/status": {
+        "path": "/status",
         "name": "Status",
         "url": "www.cloudflarestatus.com",
         "maintainers": [
-          "nczitzk"
+          "nczitzk",
+          "ljh12138164"
         ],
-        "example": "/cloudflarestatus",
+        "example": "/cloudflare/status",
+        "description": "Uses the [official API](https://www.cloudflarestatus.com/api) to provide each update for ongoing incidents and upcoming or active maintenance from [Cloudflare Status](https://www.cloudflarestatus.com/) as a separate item. The legacy route `/cloudflarestatus` redirects here.",
+        "zh": {
+          "description": "来源：[Cloudflare Status](https://www.cloudflarestatus.com/)。使用[官方 API](https://www.cloudflarestatus.com/api)获取未解决故障及计划中、进行中的维护通知，每次更新单独生成一条订阅内容。旧路由 `/cloudflarestatus` 会重定向到此路由。"
+        },
         "categories": [
           "programming"
         ],
@@ -49952,21 +50021,20 @@ export default {
             "source": [
               "www.cloudflarestatus.com"
             ],
-            "target": "/"
+            "target": "/status"
           }
         ],
         "view": 5,
-        "location": "index.tsx",
-        "module": () => import('@/routes/cloudflarestatus/index.tsx')
+        "location": "status.tsx",
+        "module": () => import('@/routes/cloudflare/status.tsx')
       }
     },
     "apiRoutes": {},
-    "name": "Cloudflare Status",
-    "url": "cloudflarestatus.com",
+    "name": "Cloudflare",
+    "url": "cloudflare.com",
     "categories": [
       "programming"
     ],
-    "description": "",
     "lang": "en"
   },
   "cloudnative": {

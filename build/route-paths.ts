@@ -674,6 +674,8 @@ export type RoutePath =
   | `/claude/code/changelog`
   | `/clickme/:site/:grouping/:name`
   | `/cline/blog`
+  | `/cloudflare/blog`
+  | `/cloudflare/status`
   | `/cloudflarestatus/`
   | `/cloudnative/blog`
   | `/cls/depth/:category?`
