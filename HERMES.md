@@ -2,8 +2,12 @@
 
 ## Active objective
 
-Author-provided descriptions are implemented and locally verified for the skills.sh trending and hot RSS feeds.
+Up to three public question comments are implemented on `feat/zhihu-hot-comments`. Live retrieval, downstream ingestion/rendering, isolated failure fallback, lint, types and Vercel build passed; 23 of 30 sampled hot questions carried 55 comments.
 
 ## Next action
 
-Deploy the description-enriched feeds, validate production latency and content, then push `feat/skills-sh-feed`.
+Push the verified branch for the user to create and merge a PR into `master`, then publish RSSHub and verify the next rss-site ingestion. See `docs/development/zhihu-hot-comments.md`.
+
+## Prior work
+
+The skills.sh descriptions were locally verified; their prior next action was production validation. See `docs/development/skills-sh-feed.md`.
