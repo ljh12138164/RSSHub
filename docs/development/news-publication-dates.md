@@ -4,7 +4,7 @@
 
 用户要求修复新闻RSSHub发布时间；无效/缺失日期在下游rss-site按抓取当天北京时间00:00兜底。RSSHub保持上游真实性，遵守AGENTS.md无日期不造日期规则。Github、Skills和知乎路由不改。
 
-分支codex/fix-news-publication-dates从origin/master 8c6fca579创建，独立工作区不带原仓库HERMES和知乎未完成改动。
+分支feat/news-publication-dates从origin/master 8c6fca579创建，独立工作区不带原仓库HERMES和知乎未完成改动。
 
 ## Feasibility and implementation
 
