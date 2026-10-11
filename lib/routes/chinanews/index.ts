@@ -43,7 +43,7 @@ async function handler(ctx) {
 
     const items = await Promise.all(
         list.map((item) =>
-            cache.tryGet(item.link!, async () => {
+            cache.tryGet(`chinanews:published-v2:${item.link}`, async () => {
                 const detailResponse = await got({
                     method: 'get',
                     url: item.link,
@@ -70,6 +70,21 @@ async function handler(ctx) {
                         .split('\u{3000}');
                     item.pubDate = timezone(parseDate(info[0], 'YYYY年MM月DD日 HH:mm'), 8);
                     item.author = info[1] + content('a.source').text();
+                }
+                const dateText =
+                    content('#pubtime_baidu').first().text() ||
+                    content('.source_time').first().text() ||
+                    content('p')
+                        .filter((_, element) => /^发布时间[：:]/.test(content(element).text().trim()))
+                        .first()
+                        .text();
+                const match = dateText.match(/(\d{4})[-年](\d{1,2})[-月](\d{1,2})日?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+                if (match) {
+                    const [, year, month, day, hour, minute, second = '00'] = match;
+                    item.pubDate = timezone(parseDate(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} ${hour.padStart(2, '0')}:${minute}:${second}`, 'YYYY-MM-DD HH:mm:ss', true), 8);
+                }
+                if (item.pubDate && Number.isNaN(new Date(item.pubDate).getTime())) {
+                    delete item.pubDate;
                 }
                 return item;
             })
