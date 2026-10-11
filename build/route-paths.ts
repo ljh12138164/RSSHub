@@ -339,7 +339,7 @@ export type RoutePath =
   | `/bbc/zhongwen/topics/:topic/:variant?`
   | `/bbcnewslabs/news`
   | `/bc3ts/post/list/:sort?`
-  | `/bcg/infrastructure`
+  | `/bcg/search/:params?`
   | `/bdys/:caty?/:type?/:area?/:year?/:order?`
   | `/behance/:user/:type?`
   | `/beijingprice/:category{.+}?`
@@ -1228,6 +1228,7 @@ export type RoutePath =
   | `/freecomputerbooks/:category?`
   | `/freewechat/profile/:id`
   | `/freexcomic/book/:id`
+  | `/freshplaza/search/:keyword`
   | `/fruitdatakings/news/:product?`
   | `/ft/myft/:key`
   | `/ftchinese/:language/:channel?`
@@ -2920,6 +2921,7 @@ export type RoutePath =
   | `/rsc/journal/:id/:category?`
   | `/rss/:url{.+}`
   | `/rss3/:account/:network?/:tag?`
+  | `/rsseverything/:language/sharedfeeds`
   | `/rsshub/routes/:lang?`
   | `/rsshub/transform/html/:url/:routeParams`
   | `/rsshub/transform/json/:url/:routeParams`
@@ -3219,6 +3221,8 @@ export type RoutePath =
   | `/stdaily/digitalpaper`
   | `/steam/appcommunityfeed/:appid/:routeParams?`
   | `/steam/curator/:id/:routeParams?`
+  | `/steam/discussion/:appid/:feature/:topicId`
+  | `/steam/discussions/:appid/:feature?`
   | `/steam/news/:appid/:language?`
   | `/steam/search/:params`
   | `/steam/sharefile-changelog/:sharefileID/:routeParams?`
@@ -3739,6 +3743,7 @@ export type RoutePath =
   | `/xiaohongshu/board/:board_id`
   | `/xiaohongshu/user/:user_id/:category/:routeParams?`
   | `/xiaomi.eu/releases`
+  | `/xiaomiev/newproducts`
   | `/xiaomiyoupin/crowdfunding`
   | `/xiaomiyoupin/latest`
   | `/xiaote/news`
