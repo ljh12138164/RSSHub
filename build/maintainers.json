@@ -1673,9 +1673,6 @@
   "/skebetter/manga/:order": [
     "SnowAgar25"
   ],
-  "/skills-sh/:view?": [
-    "ljh12138164"
-  ],
   "/sotwe/user/:id": [
     "TonyRL"
   ],
@@ -2162,6 +2159,12 @@
   ],
   "/skeb/friend_works/:username": [
     "SnowAgar25"
+  ],
+  "/skills-sh/:view?": [
+    "ljh12138164"
+  ],
+  "/skills-sh/details/:view?": [
+    "ljh12138164"
   ],
   "/techflowpost/express": [
     "nczitzk"

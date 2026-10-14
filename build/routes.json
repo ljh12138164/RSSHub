@@ -21425,39 +21425,6 @@
     "url": "skebetter.com",
     "lang": "en"
   },
-  "skills-sh": {
-    "routes": {
-      "/:view?": {
-        "path": "/:view?",
-        "categories": [
-          "programming"
-        ],
-        "example": "/skills-sh/trending",
-        "parameters": {
-          "view": "`all-time`（总安装量）、`trending`（24 小时趋势，默认）或 `hot`（当前小时相较昨天同一小时的变化）"
-        },
-        "features": {
-          "requireConfig": false,
-          "requirePuppeteer": false,
-          "antiCrawler": false,
-          "supportBT": false,
-          "supportPodcast": false,
-          "supportScihub": false
-        },
-        "name": "Leaderboard",
-        "maintainers": [
-          "ljh12138164"
-        ],
-        "description": "skills.sh Agent Skills 热门榜单。该路由需要部署在已启用 OIDC Federation 的 Vercel 项目中。",
-        "location": "index.ts",
-        "module": "() => import('@/routes/skills-sh/index.ts')"
-      }
-    },
-    "apiRoutes": {},
-    "name": "skills.sh",
-    "url": "skills.sh",
-    "lang": "en"
-  },
   "sotwe": {
     "routes": {
       "/user/:id": {
@@ -27495,6 +27462,64 @@
     "name": "Skeb",
     "url": "skeb.jp",
     "lang": "ja"
+  },
+  "skills-sh": {
+    "routes": {
+      "/:view?": {
+        "path": "/:view?",
+        "categories": [
+          "programming"
+        ],
+        "example": "/skills-sh/trending",
+        "parameters": {
+          "view": "`all-time`（总安装量）、`trending`（24 小时趋势，默认）或 `hot`（当前小时相较昨天同一小时的变化）"
+        },
+        "features": {
+          "requireConfig": false,
+          "requirePuppeteer": false,
+          "antiCrawler": false,
+          "supportBT": false,
+          "supportPodcast": false,
+          "supportScihub": false
+        },
+        "name": "Leaderboard",
+        "maintainers": [
+          "ljh12138164"
+        ],
+        "description": "skills.sh Agent Skills 热门榜单。该路由需要部署在已启用 OIDC Federation 的 Vercel 项目中。",
+        "location": "index.ts",
+        "module": "() => import('@/routes/skills-sh/index.ts')"
+      },
+      "/details/:view?": {
+        "path": "/details/:view?",
+        "categories": [
+          "programming"
+        ],
+        "example": "/skills-sh/details/trending",
+        "parameters": {
+          "view": "`all-time`（总安装量）、`trending`（24 小时趋势，默认）或 `hot`（当前小时相较昨天同一小时的变化）"
+        },
+        "features": {
+          "requireConfig": false,
+          "requirePuppeteer": false,
+          "antiCrawler": false,
+          "supportBT": false,
+          "supportPodcast": false,
+          "supportScihub": false
+        },
+        "name": "Leaderboard with instructions",
+        "maintainers": [
+          "ljh12138164"
+        ],
+        "description": "Includes complete SKILL.md snapshots when available. Use the built-in JSON Feed output to read the original Markdown and structured metadata.",
+        "location": "details.ts",
+        "module": "() => import('@/routes/skills-sh/details.ts')"
+      }
+    },
+    "apiRoutes": {},
+    "name": "skills.sh",
+    "url": "skills.sh",
+    "lang": "en"
   },
   "techflowpost": {
     "routes": {

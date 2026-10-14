@@ -3137,6 +3137,7 @@ export type RoutePath =
   | `/sketch/updates`
   | `/sketis/isabelle-dev/blog/:blog`
   | `/skills-sh/:view?`
+  | `/skills-sh/details/:view?`
   | `/skysports/news/:team`
   | `/slashdot/:section?`
   | `/slowmist/:type?`
