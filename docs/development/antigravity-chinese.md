@@ -26,6 +26,7 @@ rss-site 为中文站点，用户要求 Antigravity 的标题和正文也采用�
 ## Implementation
 
 - 基于最新 `origin/master` `b32582c8b` 创建 `feat/antigravity-chinese`。
+- PR：[RSSHub #7](https://github.com/ljh12138164/RSSHub/pull/7)，配套 [rss-site #47](https://github.com/ljh12138164/rss-site/pull/47)。CI/预览状态以 PR 检查结果为准。
 - 增加可选 lang 参数，仅支持 en（默认）与 zh-CN，保留现有英文 example 和 Radar。
 - 按页面脚本依赖定位官方中文模块，通过现有 `parseScriptSource` 提取 JSON.parse 的静态模板字符串，合并文章与通用 textMap；不执行远端代码，不增加依赖。
 - 正文先匹配 HTML 译文，再匹配纯文本译文，最后处理剩余文本节点；跳过代码块和包含媒体/嵌套块的父节点，保留正文媒体结构。官方仅提供纯文本的段落采用纯文本，可能失去行内强调与链接格式，原文 URL 保持可用。
