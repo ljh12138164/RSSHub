@@ -5,7 +5,7 @@ import { wrap } from 'oxc-parser/src-js/wrap.js';
 
 let bindingPromise: ReturnType<typeof instantiate> | undefined;
 
-export const parseScriptSource = async (source: string): Promise<{ program: Program; errors: OxcError[] }> => {
+export const parseScriptSource = async (source: string, _useRawTransfer = true): Promise<{ program: Program; errors: OxcError[] }> => {
     bindingPromise ??= instantiate(parserWasm);
     const binding = await bindingPromise;
     const { program, errors } = wrap(

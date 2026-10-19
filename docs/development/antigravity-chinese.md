@@ -31,6 +31,7 @@ rss-site 为中文站点，用户要求 Antigravity 的标题和正文也采用�
 - 按页面脚本依赖定位官方中文模块，通过现有 `parseScriptSource` 提取 JSON.parse 的静态模板字符串，合并文章与通用 textMap；不执行远端代码，不增加依赖。
 - 正文先匹配 HTML 译文，再匹配纯文本译文，最后处理剩余文本节点；跳过代码块和包含媒体/嵌套块的父节点，保留正文媒体结构。官方仅提供纯文本的段落采用纯文本，可能失去行内强调与链接格式，原文 URL 保持可用。
 - 翻译资源与中文详情单独缓存，英文详情 cache key 不变。保留官方 GUID、文章 URL、发布时间和三路并发。
+- 云端预览暴露 Oxc raw transfer 会申请 6 GiB ArrayBuffer，Vercel 抛出 `RangeError: Array buffer allocation failed`。解析工具增加可选开关且默认行为不变，本路由明确关闭该优化；Worker 实现接受同一参数并继续使用原有 WASM 解析。
 
 ## Verification
 
@@ -38,6 +39,7 @@ rss-site 为中文站点，用户要求 Antigravity 的标题和正文也采用�
 - 本机网络曾连接超时/断流；成功抓取后将原始 HTTP 响应暂存于仓库外，复用同一组真实响应检查中英文差异。未将探针或快照加入 lib/routes 测试。
 - 真实 RSS 模板输出 340,487 bytes，25 张封面，无订阅/分享组件或相对媒体地址。rss-site 的 `parseSignalFeed` 识别 25/25 中文标题、正文、封面、日期和唯一 URL；最短 HTML 2,128 字符。
 - `pnpm typecheck`、`pnpm build:routes`、变更文件 ESLint、type-aware Oxlint 和 Oxfmt 检查通过。构建过程中出现本地 cache unavailable 提示，命令退出 0。
+- 首次 Vercel 构建成功但真实路由 HTTP 503；内存问题修复后本地 25 篇差异、类型及静态检查重新通过，需在新部署完成后复验真实云端路由。构建成功不能替代运行验证。
 - Standards/Spec 自审完成：可选参数与默认兼容、动态 hash、静态数据解析、按语言缓存、媒体与日期保留、无新依赖或路由测试。未发现阻塞问题，无接受的后续事项，不创建空 roadmap。
 
 ## Risks

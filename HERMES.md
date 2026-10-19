@@ -6,7 +6,8 @@
 - 记录：`docs/development/antigravity-chinese.md`。官方中文资源已探明，25 个 RSS 标题均有官方翻译，采用已有解析器提取静态数据、动态查找 hash，不执行远端脚本。
 - 动态资源解析和官方中文替换已完成；25/25 标题正文、媒体/代码块、原 URL/日期逐篇验证，真实 RSS 经 rss-site 解析通过，类型、lint、格式和路由构建通过。
 - 已交付 RSSHub PR https://github.com/ljh12138164/RSSHub/pull/7，配套 rss-site https://github.com/ljh12138164/rss-site/pull/47；本地检查通过，CI/预览待完成。
-- 下一步等待 CI 后回归预览；不直接合并部署。需先部署 RSSHub，再发布 rss-site API，最后回归生产采集和页面更新。
+- 首次预览发现 Oxc raw transfer 的 6 GiB 虚拟缓冲区在 Vercel 分配失败；本路由已关闭该优化（工具默认不变），本地 25 篇验证重新通过。
+- 下一步等待修复构建后回归真实云端路由；不直接合并部署。需先部署 RSSHub，再发布 rss-site API，最后回归生产采集和页面更新。
 
 ## 2026-10-19 Antigravity Blog
 
