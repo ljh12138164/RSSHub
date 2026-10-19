@@ -1,5 +1,11 @@
 # HERMES
 
+## 2026-10-19 Antigravity 云端解析内存
+
+- #7 和 rss-site #47 已合并；Vercel 实际中文路由发现 raw transfer 的 6 GiB ArrayBuffer 分配失败，原 PR 合并后的修复不在 master。
+- 从最新 master `a7a3887c` 创建 `feat/antigravity-parser-memory` 移植修复；记录 `docs/development/antigravity-parser-memory.md`。
+- 本地 25 篇内容/媒体/代码块/日期对比、类型、lint 和格式通过。下一步提交补丁 PR、等待构建，再验证真实云端 Feed；不自动合并部署。
+
 ## 2026-10-19 Antigravity 官方中文
 
 - 当前目标：`feat/antigravity-chinese`，为现有 Antigravity 全文路由添加显式 zh-CN 路径，rss-site 同名分支消费；保留英文默认和原文章链接。
