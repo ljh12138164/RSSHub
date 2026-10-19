@@ -95,7 +95,8 @@ async function fetchTranslations(): Promise<Record<string, string>> {
         throw new Error('Antigravity Blog official Chinese translations not found');
     }
     const source = await ofetch(new URL(localePath, runtimeUrl).href, { responseType: 'text' });
-    const { program } = await parseScriptSource(source);
+    // Raw transfer reserves a 6 GiB buffer, which exceeds serverless memory limits.
+    const { program } = await parseScriptSource(source, false);
     const translations: Record<string, string> = {};
     for (const statement of program.body) {
         if (statement.type !== 'VariableDeclaration') {
