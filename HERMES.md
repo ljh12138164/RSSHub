@@ -2,9 +2,9 @@
 
 ## 2026-10-19 Antigravity 云端解析内存
 
-- #7 和 rss-site #47 已合并；Vercel 实际中文路由发现 raw transfer 的 6 GiB ArrayBuffer 分配失败，原 PR 合并后的修复不在 master。
-- 从最新 master `a7a3887c` 创建 `feat/antigravity-parser-memory` 移植修复；记录 `docs/development/antigravity-parser-memory.md`。
-- 本地 25 篇内容/媒体/代码块/日期对比、类型、lint 和格式通过。下一步提交补丁 PR、等待构建，再验证真实云端 Feed；不自动合并部署。
+- #7 和 rss-site #47 已合并；Vercel raw transfer 内存问题由补丁 https://github.com/ljh12138164/RSSHub/pull/8 修复，用户已合并，生产提交 `41e9dc51` 的 Vercel 检查成功。
+- `feat/antigravity-parser-memory` 记录 `docs/development/antigravity-parser-memory.md`。本地类型、lint、格式和 25 篇验证通过；真实预览和生产中文 Feed 均 HTTP 200，25/25 中文标题、正文、封面和日期。云端中英文媒体与代码块对比一致。
+- Supabase 按现有 Vault/Cron 路径执行生产采集，HTTP 200、20 条、changed=true、publication=revalidated；批次 `4546c12d-f932-4184-96a9-79ec94d403ca` succeeded，原有文章全部原地更新，零新行。浏览器确认中文列表、首篇完整正文与原文入口，Cron 119 保持 active。本任务已完成；独立跨来源通知异常不在本次结论范围。
 
 ## 2026-10-19 Antigravity 官方中文
 
