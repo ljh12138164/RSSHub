@@ -2,7 +2,6 @@ import type { Namespace } from '@/types';
 
 export const namespace: Namespace = {
     name: 'Cloudflare',
-    url: 'cloudflare.com',
-    categories: ['programming'],
+    url: 'blog.cloudflare.com',
     lang: 'en',
 };

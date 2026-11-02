@@ -1,5 +1,7 @@
 import type { CheerioAPI } from 'cheerio';
 import { load } from 'cheerio';
+import type { Element } from 'domhandler';
+import pMap from 'p-map';
 
 import type { Data, DataItem, Route } from '@/types';
 import cache from '@/utils/cache';
@@ -8,98 +10,68 @@ import { parseDate } from '@/utils/parse-date';
 
 const ROOT_URL = 'https://api-docs.deepseek.com/zh-cn';
 
-const NEWS_PATH_PREFIX = '/zh-cn/news/news';
-const NEWS_LINK_SELECTOR = 'li.theme-doc-sidebar-item-link a[href]';
+const NEWS_LIST_SELECTOR = 'aside li.theme-doc-sidebar-item-link:has(a[href^="/zh-cn/news/"])';
 const ARTICLE_CONTENT_SELECTOR = '.theme-doc-markdown > div > div';
 const ARTICLE_TITLE_SELECTOR = ARTICLE_CONTENT_SELECTOR + ' > h1';
 
-interface NewsLink {
-    date?: string;
-    url: string;
-}
-
+// Fetch and parse a documentation page.
 const fetchPageContent = async (url: string) => {
     const response = await ofetch(url);
     return load(response);
 };
 
-const extractArticleInfo = ($article: CheerioAPI) => {
+// Extract the main article content.
+const extractArticleInfo = ($article: CheerioAPI, pageURL: string) => {
     const contentElement = $article(ARTICLE_CONTENT_SELECTOR);
     const title = $article(ARTICLE_TITLE_SELECTOR).text();
-    $article(ARTICLE_TITLE_SELECTOR).remove();
+    $article(ARTICLE_TITLE_SELECTOR).remove(); // Omit the title from the article body.
     const content = contentElement.html();
-    return { title, content };
+    return { title, content, pageURL };
 };
 
-const toNewsUrl = (href: string | undefined): string | undefined => {
-    if (!href) {
-        return;
-    }
-
-    const url = new URL(href, ROOT_URL);
-    return url.pathname.startsWith(NEWS_PATH_PREFIX) ? url.href : undefined;
+const parseDateString = (dateString: string | undefined) => {
+    const date = dateString?.match(/\d{4}\/\d{2}\/\d{2}/)?.[0];
+    return date ? parseDate(`${date.replaceAll('/', '-')}T00:00:00Z`) : undefined;
 };
 
-export const findLatestNewsUrl = ($: CheerioAPI): string => {
-    const url = $('a[href]')
-        .toArray()
-        .map((anchor) => toNewsUrl($(anchor).attr('href')))
-        .find((candidate) => candidate !== undefined);
+// Create a feed item from a sidebar entry.
+const createDataItem = (item: Element, $: CheerioAPI): Promise<DataItem> => {
+    const $item = $(item);
+    const link = $item.find('a').attr('href');
+    const dateString = $item.find('a').text().split(' ').at(-1);
+    const pageURL = new URL(link || '', ROOT_URL).href;
 
-    if (!url) {
-        throw new Error('DeepSeek documentation did not expose a news page link');
-    }
-
-    return url;
-};
-
-export const extractNewsLinks = ($: CheerioAPI): NewsLink[] => {
-    const seen = new Set<string>();
-    const links: NewsLink[] = [];
-
-    for (const anchor of $(NEWS_LINK_SELECTOR).toArray()) {
-        const $anchor = $(anchor);
-        const url = toNewsUrl($anchor.attr('href'));
-        if (!url || seen.has(url)) {
-            continue;
-        }
-
-        seen.add(url);
-        links.push({
-            date: $anchor.text().match(/\d{4}[/-]\d{1,2}[/-]\d{1,2}/)?.[0],
-            url,
-        });
-    }
-
-    if (links.length === 0) {
-        throw new Error('DeepSeek news sidebar did not contain any news articles');
-    }
-
-    return links;
-};
-
-const createDataItem = ({ date, url }: NewsLink): Promise<DataItem> =>
-    cache.tryGet(url, async () => {
-        const $article = await fetchPageContent(url);
-        const { title, content } = extractArticleInfo($article);
+    return cache.tryGet(pageURL, async () => {
+        const $article = await fetchPageContent(pageURL);
+        const { title, content } = extractArticleInfo($article, pageURL);
+        const pubDate = parseDateString(dateString);
 
         return {
             title,
-            link: url,
-            ...(date && { pubDate: parseDate(date) }),
+            link: pageURL,
+            pubDate,
             description: content || undefined,
         };
     });
+};
 
 const handler = async (): Promise<Data> => {
-    const $landing = await fetchPageContent(ROOT_URL);
-    const latestNewsUrl = findLatestNewsUrl($landing);
-    const $news = await fetchPageContent(latestNewsUrl);
-    const items: DataItem[] = await Promise.all(extractNewsLinks($news).map((link) => createDataItem(link)));
+    const $home = await fetchPageContent(ROOT_URL);
+    const newsPath = $home('nav a[href^="/zh-cn/news/"]').first().attr('href');
+    if (!newsPath) {
+        throw new Error('DeepSeek news navigation link was not found on the documentation homepage');
+    }
+    const newsUrl = new URL(newsPath, ROOT_URL).href;
+    const $ = await fetchPageContent(newsUrl);
+    const newsList = $(NEWS_LIST_SELECTOR);
+
+    const entries = newsList.toArray();
+    const selected = entries;
+    const items: DataItem[] = await pMap(selected, (li) => createDataItem(li, $), { concurrency: 3 });
 
     return {
         title: 'DeepSeek 新闻',
-        link: latestNewsUrl,
+        link: newsUrl,
         item: items,
     };
 };
@@ -118,7 +90,7 @@ export const route: Route = {
     },
     radar: [
         {
-            source: ['api-docs.deepseek.com'],
+            source: ['api-docs.deepseek.com', 'api-docs.deepseek.com/zh-cn', 'api-docs.deepseek.com/zh-cn/news/:article', 'api-docs.deepseek.com/news/:article'],
             target: '/news',
         },
     ],
