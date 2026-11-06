@@ -78,19 +78,19 @@ function normalizeTranslationKey(value: string) {
 async function fetchTranslations(): Promise<Record<string, string>> {
     const html = await ofetch(`${baseUrl}/blog`, { responseType: 'text' });
     const $ = load(html);
-    const layoutPath = $('script[src*="/BaseLayout."]').attr('src');
+    const layoutPath = $('script[src*="/SharedHeadBootstrap."], script[src*="/BaseLayout."]').first().attr('src');
     if (!layoutPath) {
         throw new Error('Antigravity Blog language loader not found');
     }
     const layoutUrl = new URL(layoutPath, baseUrl).href;
     const layout = await ofetch(layoutUrl, { responseType: 'text' });
-    const runtimePath = layout.match(/["'](\.\/runtime\.[^"']+\.js)["']/)?.[1];
+    const runtimePath = layout.match(/[`"'](\.\/runtime\.[^`"']+\.js)[`"']/)?.[1];
     if (!runtimePath) {
         throw new Error('Antigravity Blog language runtime not found');
     }
     const runtimeUrl = new URL(runtimePath, layoutUrl).href;
     const runtime = await ofetch(runtimeUrl, { responseType: 'text' });
-    const localePath = runtime.match(/"\.\/locales\/zh-CN\/blog\.json"\s*:\s*\(\)\s*=>[\s\S]*?import\(\s*[`"']([^`"']+)[`"']\s*\)/)?.[1];
+    const localePath = runtime.match(/"\.{1,2}\/locales\/zh-CN\/blog\.json"\s*:\s*\(\)\s*=>[\s\S]*?import\(\s*[`"']([^`"']+)[`"']\s*\)/)?.[1];
     if (!localePath) {
         throw new Error('Antigravity Blog official Chinese translations not found');
     }
