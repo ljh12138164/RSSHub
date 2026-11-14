@@ -1,7 +1,7 @@
 import type { Namespace } from '@/types';
 
 export const namespace: Namespace = {
-    name: 'BBC News Labs',
-    url: 'www.bbc.co.uk/rdnewslabs',
-    lang: 'en',
+    name: '可可影视',
+    url: 'www.keke1.app',
+    lang: 'zh-CN',
 };

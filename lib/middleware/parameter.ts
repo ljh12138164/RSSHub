@@ -12,12 +12,16 @@ import { config } from '@/config';
 import type { Data, DataItem } from '@/types';
 import { extractAttachments, getImageMimeType } from '@/utils/attachments';
 import cache from '@/utils/cache';
-import { isWorker } from '@/utils/is-worker';
 import ofetch from '@/utils/ofetch';
 
 const md = markdownit({
     html: true,
 });
+
+const removeImages = ($: CheerioAPI) => {
+    $('img, picture').remove();
+    $('video[poster]').removeAttr('poster');
+};
 
 const resolveRelativeLink = ($: CheerioAPI, elem: Element, attr: string, baseUrl?: string) => {
     const $elem = $(elem);
@@ -125,8 +129,7 @@ const middleware: MiddlewareHandler = async (ctx, next) => {
 
                 $('script').remove();
                 if (hideImages) {
-                    $('img, picture').remove();
-                    $('video[poster]').removeAttr('poster');
+                    removeImages($);
                 }
 
                 $('img').each((_, ele) => {
@@ -366,8 +369,16 @@ const middleware: MiddlewareHandler = async (ctx, next) => {
 
                 item.author = author || parsed_result?.author;
                 item.description = parsed_result && parsed_result.content.length > 40 ? decodeHTMLStrict(parsed_result.content) : description;
-                if (extractEnclosures && parsed_result?.content.length > 40 && item.description) {
-                    item.attachments = extractAttachments(load(item.description), item, hideImages);
+                if ((!hideImages && !extractEnclosures) || !(parsed_result?.content.length > 40) || !item.description) {
+                    return;
+                }
+                const $ = load(item.description);
+                if (hideImages) {
+                    removeImages($);
+                    item.description = $('body').html()!;
+                }
+                if (extractEnclosures) {
+                    item.attachments = extractAttachments($, item, hideImages);
                 }
             });
             await Promise.all(tasks);
@@ -439,7 +450,7 @@ const middleware: MiddlewareHandler = async (ctx, next) => {
         }
 
         // opencc
-        if (!isWorker && ctx.req.query('opencc')) {
+        if (ctx.req.query('opencc')) {
             const { simplecc } = await import('simplecc-wasm');
             for (const item of data.item) {
                 item.title = simplecc(item.title ?? item.link, ctx.req.query('opencc')!);

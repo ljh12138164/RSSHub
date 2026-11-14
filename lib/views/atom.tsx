@@ -10,7 +10,7 @@ const Link: FC<Record<string, string | number | undefined>> = (props) =>
         .map(([name, value]) => html` ${name}="${value}"`)} />`;
 
 const RSS: FC<{ data: Data }> = ({ data }) => (
-    <feed xmlns="http://www.w3.org/2005/Atom" xmlns:rsshub="http://rsshub.app/xml/schemas" xml:lang={data.language || 'en'}>
+    <feed xmlns="http://www.w3.org/2005/Atom" xmlns:rsshub="http://rsshub.app/xml/schemas" xmlns:media={data.item?.some((item) => item.media) ? 'http://search.yahoo.com/mrss/' : undefined} xml:lang={data.language || 'en'}>
         {html`<title>${data.title || 'RSSHub'}</title>`}
         <Link rel="alternate" href={data.link || 'https://docs.rsshub.app'} />
         <Link rel="self" href={data.atomlink} type="application/atom+xml" />
@@ -29,6 +29,9 @@ const RSS: FC<{ data: Data }> = ({ data }) => (
                 {html`<title>${item.title}</title>`}
                 {item.description ? <content type="html">{item.description}</content> : item.content?.text ? <content type="text">{item.content.text}</content> : <content src={item.link} type="text/html" />}
                 <Link href={item.link} />
+                {item.links?.map((link) => (
+                    <Link rel={link.rel} href={link.url} type={link.type} title={link.title} />
+                ))}
                 {getItemAttachments(item).map((attachment) => (
                     <Link rel="enclosure" href={attachment.url} type={attachment.mime_type} length={attachment.size_in_bytes} title={attachment.title} />
                 ))}
