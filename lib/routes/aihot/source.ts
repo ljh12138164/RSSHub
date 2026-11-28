@@ -79,7 +79,7 @@ async function handler(ctx: Context): Promise<Data> {
         3600 * 4
     );
     const sourceLink = `${BASE_URL}/leaderboard/sources/${sourceKey}`;
-    const pubDate = parseDate(run?.generatedAt || Date.now());
+    const pubDate = parseDate(run?.generatedAt || Temporal.Now.instant().epochMilliseconds);
 
     const items: DataItem[] = (rows || []).map((row) => {
         const title = `[No.${row.sourceRank} 得分: ${row.display}] ${row.sourceModelName} (${row.provider})`;

@@ -204,7 +204,7 @@ function getDescription(skill: Skill, token: string): Promise<string | null> {
 }
 
 export function parseDescription(contents: string): string | null {
-    const frontmatter = contents.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1];
+    const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(contents)?.[1];
     if (!frontmatter) {
         return null;
     }

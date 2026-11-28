@@ -150,7 +150,7 @@ async function handler(ctx: Context): Promise<Data> {
         link: modelLink,
         guid: `aihot:model:${slug}:overview`,
         author: model.provider,
-        pubDate: parseDate(model.releasedAt || run?.generatedAt || Date.now()),
+        pubDate: parseDate(model.releasedAt || run?.generatedAt || Temporal.Now.instant().epochMilliseconds),
         description: overviewHtml,
         category: ['总览', model.provider],
     });
@@ -200,7 +200,7 @@ async function handler(ctx: Context): Promise<Data> {
             link: modelLink,
             guid: `aihot:model:${slug}:${group.key}`,
             author: model.provider,
-            pubDate: parseDate(model.releasedAt || run?.generatedAt || Date.now()),
+            pubDate: parseDate(model.releasedAt || run?.generatedAt || Temporal.Now.instant().epochMilliseconds),
             description: groupDescription,
             category: [group.name, model.provider],
         });
@@ -214,7 +214,7 @@ async function handler(ctx: Context): Promise<Data> {
             link: modelLink,
             guid: `aihot:model:${slug}:unmeasured`,
             author: model.provider,
-            pubDate: parseDate(model.releasedAt || run?.generatedAt || Date.now()),
+            pubDate: parseDate(model.releasedAt || run?.generatedAt || Temporal.Now.instant().epochMilliseconds),
             description: `<div style="font-family: sans-serif;"><h3>尚未取得有效成绩的公开评测项（${unmeasured.length}项）：</h3><ul>${unmeasuredList}</ul></div>`,
             category: ['待测项', model.provider],
         });
