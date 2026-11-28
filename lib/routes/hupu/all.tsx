@@ -1,12 +1,11 @@
 import { load } from 'cheerio';
-import { raw } from 'hono/html';
-import { renderToString } from 'hono/jsx/dom/server';
 
 import type { DataItem, Route } from '@/types';
 import cache from '@/utils/cache';
 import got from '@/utils/got';
 
-import { extractForumThreadDates } from './utils';
+import renderDescription from './templates/description';
+import { extractForumThreadDates, extractNextData } from './utils';
 
 export const route: Route = {
     path: '/all/:id?',
@@ -63,7 +62,7 @@ async function handler(ctx) {
 
     items = await Promise.all(
         items.map((item) =>
-            cache.tryGet(item.link, async () => {
+            cache.tryGet(`hupu:thread:v2:${item.link}`, async () => {
                 try {
                     const detailResponse = await got({
                         method: 'get',
@@ -72,29 +71,28 @@ async function handler(ctx) {
 
                     const content = load(detailResponse.data);
 
-                    const videos: any[] = [];
-
-                    content('.hupu-post-video').each((_, el) => {
-                        videos.push({
-                            source: content(el).attr('src'),
-                            poster: content(el).attr('poster'),
-                        });
+                    const body = content('.bbs-content').first();
+                    body.find('.hupu-img').each((_, element) => {
+                        const image = content(element);
+                        const src = image.attr('data-gif') || image.attr('data-origin') || image.attr('src');
+                        if (src) {
+                            image.replaceWith(content('<img>').attr('src', src));
+                        }
                     });
+                    body.find('video').attr({ controls: '', preload: 'none' });
+                    const videos = content('video.hupu-post-video')
+                        .not(body.find('video'))
+                        .toArray()
+                        .map((video) => {
+                            const element = content(video);
+                            return { src: element.attr('src') || element.find('source').first().attr('src'), poster: element.attr('poster') };
+                        });
 
-                    item.author = content('.bbs-user-wrapper-content-name-span').first().text();
-                    const description = content('.bbs-content').first().html();
-                    item.description = renderToString(
-                        <>
-                            {videos.length
-                                ? videos.map((video) => (
-                                      <video poster={video.poster} controls>
-                                          <source src={video.source} type="video/mp4" />
-                                      </video>
-                                  ))
-                                : null}
-                            {description ? raw(description) : null}
-                        </>
-                    );
+                    return {
+                        ...item,
+                        author: content('.bbs-user-wrapper-content-name-span').first().text(),
+                        description: renderDescription(body.html(), videos, getReplies(detailResponse.data)),
+                    };
                 } catch {
                     // no-empty
                 }
@@ -109,4 +107,47 @@ async function handler(ctx) {
         link: currentUrl,
         item: items,
     };
+}
+
+interface Reply {
+    pid: number;
+    user?: { username?: string };
+    content?: string;
+    light?: number;
+    hide?: boolean;
+    illegal?: boolean;
+    isHidden?: boolean;
+    isDelete?: boolean;
+    isAudit?: boolean;
+    isSelfDelete?: boolean;
+}
+
+interface ReplyPage {
+    props?: { pageProps?: { initialRepliesData?: { lightReplies?: Reply[]; initialReplies?: Reply[] } } };
+}
+
+function isPublicReply(reply: Reply) {
+    return !reply.hide && !reply.illegal && !reply.isHidden && !reply.isDelete && !reply.isAudit && !reply.isSelfDelete;
+}
+
+function getReplies(html: string) {
+    let data: ReplyPage['props'];
+    try {
+        data = extractNextData<ReplyPage>(html).props;
+    } catch {
+        return [];
+    }
+    const replies = data?.pageProps?.initialRepliesData;
+    const unique = new Map<number, Reply>();
+    for (const reply of [...(replies?.lightReplies ?? []), ...(replies?.initialReplies ?? [])]) {
+        if (isPublicReply(reply) && reply.content && !unique.has(reply.pid)) {
+            unique.set(reply.pid, reply);
+        }
+    }
+    return unique
+        .values()
+        .toArray()
+        .map((reply) => ({ author: reply.user?.username, text: load(reply.content!, null, false).text().trim(), likes: reply.light }))
+        .filter((reply) => reply.text)
+        .slice(0, 3);
 }
