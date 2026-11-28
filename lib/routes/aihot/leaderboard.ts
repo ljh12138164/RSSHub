@@ -205,7 +205,7 @@ async function handler(ctx: Context): Promise<Data> {
   ${access?.weightsUrl ? `<p style="margin: 8px 0;"><strong>开源权重：</strong><a href="${access.weightsUrl}" target="_blank" rel="noopener noreferrer">Hugging Face 仓库 ↗</a></p>` : ''}
   
   <p style="margin: 8px 0 0 0; font-size: 12px; color: #888;">
-    评分方法：${payload.run?.methodologyVersion || 'IRT 模型评分'} · 计算批次：${payload.run?.generatedAt ? new Date(payload.run.generatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '最新'}
+    评分方法：${payload.run?.methodologyVersion || 'IRT 模型评分'} · 计算批次：${parseDate(payload.run?.generatedAt ?? '')?.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) ?? '最新'}
   </p>
 </div>
         `.trim();
@@ -217,7 +217,7 @@ async function handler(ctx: Context): Promise<Data> {
             link: `${BASE_URL}/leaderboard/${model.slug}`,
             guid: `aihot:leaderboard:${category}:${model.slug}:${entry.rank}`,
             author: model.provider,
-            pubDate: parseDate(model.releasedAt || payload.run?.generatedAt || Date.now()),
+            pubDate: parseDate(model.releasedAt || payload.run?.generatedAt || Temporal.Now.instant().epochMilliseconds),
             description,
             category: categories,
         };

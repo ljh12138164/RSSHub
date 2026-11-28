@@ -40,7 +40,6 @@ function createItem(incident: Incident, update: IncidentUpdate, index: number) {
     const instant = parseDate(update.display_at) ?? Temporal.Now.instant();
     const timestamp = Math.floor(instant.epochMilliseconds / 1000) * 1000;
     const pubDate = Temporal.Instant.fromEpochMilliseconds(timestamp);
-    const pubDateObj = new Date(timestamp);
     const link = `${baseUrl}/incidents/${incident.id}`;
     const guid = `${link}#${timestamp}`;
     const description = renderToString(
@@ -52,13 +51,13 @@ function createItem(incident: Incident, update: IncidentUpdate, index: number) {
                     {' - '}
                 </>
             ) : null}
-            <span class="whitespace-pre-wrap">{raw(body)}</span>
+            <span className="whitespace-pre-wrap">{raw(body)}</span>
             <br />
             <small>
-                <span class="ago" data-datetime-unix={timestamp} />
-                {pubDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
+                <span className="ago" data-datetime-unix={timestamp} />
+                {pubDate.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                 {' - '}
-                {pubDateObj.toISOString().slice(11, 16)} UTC
+                {pubDate.toString().slice(11, 16)} UTC
             </small>
         </>
     );
@@ -77,7 +76,7 @@ function createItem(incident: Incident, update: IncidentUpdate, index: number) {
     } satisfies DataItem;
 }
 
-export const handler = async (ctx: Context): Promise<Data> => {
+const handler = async (ctx: Context): Promise<Data> => {
     const limit = Number(ctx.req.query('limit') ?? '100');
     const response = await ofetch<StatusResponse>(`${baseUrl}/api/v2/summary.json`, {
         headers: { 'User-Agent': config.trueUA },
